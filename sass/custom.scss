@@ -1,0 +1,19 @@
+a {
+  cursor: pointer;
+  color: #23d555;
+  text-decoration: none;
+  border-bottom: 1px solid #1ce288
+}
+
+a:hover {
+  background-color: #13a0c2;
+  color: #fff
+}
+
+a[itemprop="url"] {
+  color: #00ff99;
+}
+
+img {
+  width: 100%;
+}
