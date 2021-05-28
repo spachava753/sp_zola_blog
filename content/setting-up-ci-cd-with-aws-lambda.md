@@ -1,6 +1,8 @@
 +++
 title = "Setting up CI/CD with AWS Lambda"
 date = 2019-08-10
+[taxonomies]
+tags = ["AWS", "Tutorial", "CI/CD", "Serverless"]
 +++
 # Intro
 

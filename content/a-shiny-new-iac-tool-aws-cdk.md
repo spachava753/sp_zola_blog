@@ -1,6 +1,8 @@
 +++
 title = "A Shiny New IaC Tool: AWS CDK"
 date = 2020-04-17
+[taxonomies]
+tags = ["AWS", "Infrastructure Provisioning"]
 +++
 
 AWS has been continuously improving its cloud services day by day, and has never failed to amaze me. My website is currently hosted on AWS utilizing CodePipeline and static sites with S3, and I'm loving it. With the rise of IaC and DevOps, I barely have to touch the AWS console anymore to provision my infrastructure. AWS's answer to IaC was to build Cloudformation. I personally have barely used Cloudformation, as I felt a massive headache coming on every time I looked at the hundreds of lines of YAML code that must be written to achieve something significant. Of course, another very popular option is Terraform, which in my very biased opinion, is the de facto tool to provision infrastructure. Terraform supports multiple cloud providers like AWS, GCP, and Azure, and you can even support a whole new provider by writing a plugin yourself. The only problem with Terraform is the fact that you can't use a full blown programming language and must use HCL, Hashicorp's custom language. Naturally, I got very excited hearing about AWS CDK, where I could use the full blown power of a programming language like Python, Java, or Typescript to provision my infrastructure. Let's dive in!

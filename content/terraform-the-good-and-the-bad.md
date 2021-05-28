@@ -2,7 +2,7 @@
 title = "Terraform: The Good and The Bad"
 date = 2018-12-06
 [taxonomies]
-tags = ["Devops", "Terraform", "Infrastructure Provisioning", "Cloud-agnostic"]
+tags = ["Terraform", "Infrastructure Provisioning"]
 +++
 
 # Intro

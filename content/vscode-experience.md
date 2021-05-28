@@ -1,6 +1,8 @@
 +++
 title = "VS Code - The editor that could?"
 date = 2020-01-16
+[taxonomies]
+tags = ["Editors"]
 +++
 
 # VS Code vs. Atom

@@ -1,6 +1,8 @@
 +++
 title = "GatsbyJS: Not just a SSG"
 date = 2019-08-29
+[taxonomies]
+tags = ["SSG", "Tutorial", "AppSync", "GraphQl"]
 +++
 By now, I'm sure everybody has heard of GatsbyJS. It's a React-based web framework with a plugin system that allows you to glue various data sources to page views. Of course, it functions as a SSG (**S**tatic **S**ite **G**enerator), but it's much more powerful than that.
 
@@ -20,7 +22,7 @@ According to [gatsbyjs.org](https://www.gatsbyjs.org/):
 
 Notice that it says that Gatsby is a framework based on React. This means you can use the same flow that you use to develop React applications. There are only a couple of lines of code that you have to add to make Gatsby work, but you don't need to change the way you write code. Frontend developers will rejoice over this. I also mentioned that Gatsby will only pre-render what it can at build time, so you can still create a fetch dynamic data at run-time and populate that then. What this allows you to do is first show the user some kind of feedback, like a pre-rendered header and footer, and dynamically load data. Something like this:
 
-![GIF showing dynamically loaded content](static/dynamic-data-fetching.gif "GIF showing dynamically loaded content")
+![GIF showing dynamically loaded content](dynamic-data-fetching.gif "GIF showing dynamically loaded content")
 
 We are essentially creeping into the territory of web applications. You would be hard-pressed to be able to do this in other static site generators, especially ones like Hugo that use HTML templates to create static sites.
 

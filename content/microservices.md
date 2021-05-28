@@ -1,6 +1,8 @@
 +++
 title = "Microservices 😱"
 date = 2021-01-24
+[taxonomies]
+tags = ["Microservices"]
 +++
 
 Writing microservices is hard. Doesn't matter what language, going from monolith to microservices means introducing more moving parts, more possibilities for failure, yet in order to scale effectively, they are a necessary evil. According to this [post](http://highscalability.com/blog/2014/4/8/microservices-not-a-free-lunch.html) on the High Scalability blog, authored by Benjamin Wootton, CTO of [Contino](https://www.contino.io/): the definition microservices is this:

@@ -1,6 +1,8 @@
 +++
 title = "Why Kubernetes?"
 date = 2020-01-16
+[taxonomies]
+tags = ["Kubernetes"]
 +++
 
 In order to understand why a container orchestration platform is needed, one must first understand why containers are needed. 

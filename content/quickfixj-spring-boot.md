@@ -2,7 +2,7 @@
 title = "QuickFixJ and Spring Boot tutorial"
 date = 2018-11-17
 [taxonomies]
-tags = ["FIX", "Java", "Spring boot", "Finance", "Tutorial"]
+tags = ["Java", "Spring boot", "Finance", "Tutorial"]
 +++
 
 # What is QuickFixJ

@@ -1,6 +1,8 @@
 +++
 title = "SpaCy and NLTK: the Successor and the Predecessor"
 date = 2019-08-23
+[taxonomies]
+tags = ["ML", "NLP"]
 +++
 [SpaCy](https://spacy.io/) has taken the NLP world by storm. It's reasonable to say that SpaCy is NLTK's successor. Or is it? In this article I will talk about SpaCy, NLTK, and what each is capable of.
 

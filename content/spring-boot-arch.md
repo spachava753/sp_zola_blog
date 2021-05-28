@@ -1,6 +1,8 @@
 +++
 title = "Spring Boot Architecture"
 date = 2018-12-19
+[taxonomies]
+tags = ["Spring Boot"]
 +++
 
 ## A Bootiful Introduction

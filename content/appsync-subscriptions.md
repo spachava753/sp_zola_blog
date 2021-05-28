@@ -1,6 +1,8 @@
 +++
 title = "The Complete Guide to AppSync Subscriptions"
 date = 2020-06-15
+[taxonomies]
+tags = ["AWS", "Tutorial", "AppSync", "GraphQl"]
 +++
 
 Appsync Subscriptions are important for anyone that wants to develop a realtime app. However, I had a lot of trouble trying to understand and use subscriptions. The documentation provided plenty of help and laid down the foundations, but there were some concepts that were discovered through Googling, trial and error, and Stack Overflow. My hope in writing the following post is that you won't struggle as much as I did, and will avoid the mistakes I made while working with Appsync subscriptions.
