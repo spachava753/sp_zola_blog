@@ -28,3 +28,4 @@ after_dark_menu = [
     {url = "$BASE_URL/tags", name = "Tags"},
     {url = "https://github.com/spachava753", name = "Github"},
 ]
+after_dark_title = "The Sp Blog"
