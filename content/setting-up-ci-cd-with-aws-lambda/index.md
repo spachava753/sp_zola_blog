@@ -14,7 +14,7 @@ Don't get me wrong. There are plenty of CI tools out there, and we can't go on w
 
 # The Architecture
 
-![Lambda CI/CD Diagram](/static/lambda-cicd.jpg "Lambda CI/CD Architecture")
+{{ resize_image(path="setting-up-ci-cd-with-aws-lambda/lambda-cicd.jpg", width=800, height=800, op="fit") }}
 
 The architecture outlined above will be how we will set up the pipeline.
 
