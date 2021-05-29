@@ -3,8 +3,6 @@ title = "Kubernetes: A look into the guts"
 date = 2019-09-06
 +++
 
-{{ page.assets }}
-
 **Kubernetes.** A word that is well-known and hyped throughout the industry. I won't go into all things great about Kubernetes, but here are just a few.
 
 # Flexible and extensible
