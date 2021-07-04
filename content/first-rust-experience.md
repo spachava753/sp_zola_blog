@@ -39,6 +39,10 @@ Rust tops the most loved language five years in a row, I decided to take stab tr
 once more, which was much less confusing than when I read the first time. Due personal circumstances, I didn't follow up
 and just ended my second foray right there.
 
-It wasn't until recently that I made my third foray into Rust. This time, I wanted to commit and implement some kind of project to actually learn the language. I was inspired by the constant stream of blog or reddit posts that reported a multi-fold increase in performance, the reliability of deployed services written Rust, as well as a number of highprofile projects written in Rust (one example is [firecracker](https://github.com/firecracker-microvm/firecracker).  
+It wasn't until recently that I made my third foray into Rust. This time, I wanted to commit and implement some kind of project to actually learn the language. I was inspired by the constant stream of blog or reddit posts that reported a multi-fold increase in performance, the reliability of deployed services written Rust, as well as a number of highprofile projects written in Rust (one example is [firecracker](https://github.com/firecracker-microvm/firecracker). The first thing I did, was go through the Rust book...again. This time around, I finished in about a day, as I was able to grok most of the concepts easily by drawing on previous experiences. The next thing I did was read a number of blog posts and Rust books. While doing so, I was searching for a viable project to start. I wanted something non-trivial, something that takes more than an evening, or a couple of "getting started" tutorials. Finally, I settled on a port of a project that requires high performance and reliability.
+
+# The Project
+
+
 
 Some content here
