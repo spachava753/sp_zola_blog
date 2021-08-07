@@ -50,7 +50,9 @@ func main() {
 		return
 	}
 
-	commit = commit[:7]
+	if len(commit) > 6 {
+		commit = commit[:7]
+	}
 
 	url := fmt.Sprintf("https://%s.sp-zola-blog.pages.dev", commit)
 
