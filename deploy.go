@@ -58,7 +58,7 @@ func main() {
 
 	fmt.Printf("building with base url %s\n", url)
 
-	if err := runCommand("zola", "build", "--base-rul", url); err != nil {
+	if err := runCommand("zola", "build", "--base-url", url); err != nil {
 		fmt.Printf("found error while building site for branch build: %s\n", err)
 		return
 	}
