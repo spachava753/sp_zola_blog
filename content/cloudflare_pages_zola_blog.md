@@ -11,5 +11,5 @@ tags = ["Zola", "Go", "Cloudflare"]
 - [ ] talk about why zola
 - [ ] talk about why cloudflare pages
 - [ ] talk about how i deploy my blog
-    - [ ] golang deployment script
+    - [ ] testing golang deployment script
 
