@@ -1,9 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"os/exec"
+	"time"
 )
 
 func runCommand(command string, args ...string) error {
@@ -11,6 +15,45 @@ func runCommand(command string, args ...string) error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
+}
+
+type Deployments struct {
+	Results []struct {
+		URL string `json:"url"`
+	} `json:"result"`
+}
+
+func getLatestDeployment(accountId, email, apiToken string) (string, error) {
+	var url string
+	req, err := http.NewRequest("GET",
+		fmt.Sprintf("https://api.cloudflare.com/client/v4/accounts/%s/pages/projects/sp-zola-blog/deployments",
+			accountId),
+		nil)
+	if err != nil {
+		return url, fmt.Errorf("found error while creating request for fetching deployments: %w", err)
+	}
+
+	req.Header.Add("X-Auth-Email", email)
+	req.Header.Add("X-Auth-Key", apiToken)
+
+	client := &http.Client{
+		Timeout: time.Second * 30,
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return url, fmt.Errorf("could not complete request: %w", err)
+	}
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return url, fmt.Errorf("could not read response body: %w", err)
+	}
+	var deployments Deployments
+	if err := json.Unmarshal(respBody, &deployments); err != nil {
+		return url, fmt.Errorf("could not unmarshal deployments: %w", err)
+	}
+	url = deployments.Results[0].URL
+	return url, nil
 }
 
 func main() {
@@ -43,22 +86,33 @@ func main() {
 
 	fmt.Println("deploying to branch build")
 
-	commit := os.Getenv("CF_PAGES_COMMIT_SHA")
-
-	if commit == "" {
-		fmt.Println("env CF_PAGES_COMMIT_SHA is not set!")
+	accountId := os.Getenv("ACCOUNT_ID")
+	if accountId == "" {
+		fmt.Printf("ACCOUNT_ID env is missing")
 		return
 	}
 
-	if len(commit) > 6 {
-		commit = commit[:7]
+	email := os.Getenv("EMAIL")
+	if email == "" {
+		fmt.Printf("EMAIL env is missing")
+		return
 	}
 
-	url := fmt.Sprintf("https://%s.sp-zola-blog.pages.dev", commit)
+	apiToken := os.Getenv("API_TOKEN")
+	if apiToken == "" {
+		fmt.Printf("API_TOKEN env is missing")
+		return
+	}
+
+	url, err := getLatestDeployment(accountId, email, apiToken)
+	if err != nil {
+		fmt.Printf("could not get latest deployment url: %s\n", err)
+		return
+	}
 
 	fmt.Printf("building with base url %s\n", url)
 
-	if err := runCommand("zola", "build", "--base-rul", url); err != nil {
+	if err := runCommand("zola", "build", "--base-url", url); err != nil {
 		fmt.Printf("found error while building site for branch build: %s\n", err)
 		return
 	}
