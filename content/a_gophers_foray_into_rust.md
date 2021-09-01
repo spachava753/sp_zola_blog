@@ -68,26 +68,27 @@ I didn't need to create a separate blocking thread to run [diesel](https://githu
 However, the latest version of sqlx (which was 0.5.x at the time) used the Tokio runtime 1.0, which was incompatible
 with the Actix runtime, which relied upon the 0.2.x version of the Tokio runtime. To make sqlx work, I had to use one
 version prior, 0.4.x which used the 0.2.x Tokio runtime, making it compatible with the Actix runtime. After continuing
-to develop the application, I became more and more annoyed with Actix. Actix has its own data types that behave
-similarly to `Arc<T>`, which must be used to pass data to each of the "workers" that the Actix runtime creates per
-thread, BUT if the data is already thread-safe, then you have to wrap the data with a _different_ type. I pulled
+to develop the application, I became more and more annoyed with Actix. One of the pain points was that Actix has its own
+data types that behave similarly to `Arc<T>`, which must be used to pass data to each of the "workers" that the Actix
+runtime creates per thread, BUT if the data is already thread-safe, then you have to wrap the data with a _different_
+type. Figuring out when to what Actix specific type was pretty frustrating. I pulled
 in [reqwest](https://github.com/seanmonstar/reqwest) to fetch the XML data, but it relied on the Tokio 1.x runtime,
 which again meant that I had to search for an old enough version that used the Tokio 0.2.x. At this point, I was pretty
 annoyed with Actix Web, so I searched for an alternative, and I found [warp](https://github.com/seanmonstar/warp). A
-major point of confusion is why Actix implemented its own runtime when Tokio 0.2.x and above is a **work-stealing
+major point of confusion is **why** Actix implemented its own runtime when Tokio 0.2.x and above is a **work-stealing
 scheduler, just like Golang's goroutine runtime** (see the blog
-post ["Making the Tokio scheduler 10x faster"](https://tokio.rs/blog/2019-10-scheduler)). I liked the simplicity of
-warp, and I was able to upgrade sqlx and reqwest to use the Tokio 1.x runtime. Sqlx version 0.5, in particular, offered
-a better API as I was having problems connecting to the database in 0.4.x, which was resolved in the latest version.
+post ["Making the Tokio scheduler 10x faster"](https://tokio.rs/blog/2019-10-scheduler)). At that point, we could leave
+the task scheduling to Tokio. I liked the simplicity of warp, and I was able to upgrade sqlx and reqwest to use the
+Tokio 1.x runtime. Sqlx version 0.5, in particular, offered a better API as I was having problems connecting to the
+database in 0.4.x, which was resolved in the latest version.
 
 I struggled through the rest of the feature set ([serde](https://github.com/serde-rs/serde) in particular was an
 absolute joy to use) and eventually matched the feature set implemented in the Golang app. One point of interest is I
 could not find any sufficiently advanced local cache libraries like
 Golang's [bigcache](https://github.com/allegro/bigcache), which automatically collects stale entries, but I did
 find [cached](https://github.com/jaemk/cached). Cached offered a TTL-based read-write lock hashmap, which was good
-enough to move forward with the application. The app needs a local cache so the database isn't overwhelmed and the
-Golang app used bigcache, so I was somewhat disappointed to find that there weren't any equivalents in the Rust
-ecosystem.
+enough to move forward with the application. The app needs a local cache so the database isn't overwhelmed, so I was
+somewhat disappointed to find that there weren't any equivalents in the Rust ecosystem.
 
 After fighting with the compiler, the Rust app reached the same point as the Golang app. After benchmarking the Rust
 application it achieved a measly 10,000 requests per second! It also had much, much higher tail latencies past 2000
@@ -96,23 +97,23 @@ app and thought it was because I was not using Actix Web which tops
 the [Techempower benchmarks](https://www.techempower.com/benchmarks/). For reference, the Golang app used the
 famous [fast-http](https://github.com/valyala/fasthttp) package, which was one of the top frameworks in the Techempower
 benchmarks in comparison to warp. So I fought with the compiler and incompatible dependencies for a couple of late
-nights to convert the Rust to use Actix Web, but the performance was roughly the same. At this point, I was lost as to
-why my Rust application was doing so bad until I realized after a week-long break from the project that it was probably
-mutex contention. After all, bigcache used a **sharded** hashmap, so I pulled
-in [dashmap](https://github.com/xacrimon/dashmap). I went back to using warp and Tokio 1.x, converted the cache to use
-dashmap, and the performance shot up to 35,000 requests per second, with half of the latency of the Golang
-application **and** very impressive small tail latencies! At this point, I was curious as to what else I could improve just by pulling different dependencies. After searching around, I realized that I could use a different hashing
-function, such as [aHash](https://github.com/tkaitchuck/aHash) which is designed to be used "in in-memory hashmaps".
-Just by replacing the hash function, the requests per second shot up _again_ to 45,000 with slightly better latencies.
+nights to convert the Rust to use Actix Web, but the performance was roughly the same. Later on, I found this
+Github [issue](https://github.com/seanmonstar/warp/issues/415) on warp's repository which debunked my misconception that
+warp was the performance bottleneck. At this point, I was lost as to why my Rust application was doing so bad until I
+realized after a week-long break from the project that it was probably mutex contention. After all, bigcache is a
+**sharded** cache library, so I pulled in [dashmap](https://github.com/xacrimon/dashmap). I went back to using warp and
+Tokio 1.x, converted the cache to use dashmap, and the performance shot up to 35,000 requests per second, with half of
+the latency of the Golang application **and** very impressive small tail latencies! At this point, I was curious as to
+what else I could improve just by replacing certain components of the application. After searching around, I realized
+that I could use a different hashing function, such as [aHash](https://github.com/tkaitchuck/aHash) which is designed to
+be used "in in-memory hashmaps". Just by replacing the hash function, the requests per second shot up _again_ to 45,000
+with slightly better latencies.
 
 After this point, I stopped as I was burnt out, but there were still options left to explore. For example, at this point
 in time, dashmap did not use the [parking lot](https://github.com/Amanieu/parking_lot) library, which boasts
 significantly better performance than the standard library mutexes used in dashmap:
 
 > When tested on x86_64 Linux, parking_lot::Mutex was found to be 1.5x faster than std::sync::Mutex when uncontended, and up to 5x faster when contended from multiple threads. The numbers for RwLock vary depending on the number of reader and writer threads, but are almost always faster than the standard library RwLock, and even up to 50x faster in some cases
-
-I also didn't bother going back and fixing some particularly gnarly code in the hot path that left some performance
-gains on the table.
 
 # Thoughts
 
@@ -129,15 +130,17 @@ there, as well as lessons learned.
 
 There were certain points that I liked about the experience that I want to share. First, the rules of the ownership
 system in Rust is pretty intuitive, at least for an experienced programmer, especially one that has experienced some
-pitfalls of concurrency. However, coming from Golang's succinct syntax, I felt less productive when writing Rust code. I
-am sure it will get better with time and practice, but it is a stark contrast to Go's learning experience where the "Tour of Go" is enough to write decent code. Fracturing in the Rust async ecosystem also made me fatigued, although
+pitfalls of concurrency. However, figuring out how to operate with the ownership system is difficult, especially when
+you might not understand why the compiler is yelling at about lifetimes. Coming from Golang's succinct syntax,
+I felt less productive when writing Rust code. I am sure it will get better with time and practice, but it is a stark
+contrast to Go's learning experience where the "Tour of Go" is enough to write decent code. Fracturing in the Rust async ecosystem also made me fatigued, although
 that's getting much better and can only improve as time goes on. One thing in particular that I found absolutely amazing
 is the advanced type system. I didn't realize what I was missing out on until I used Rust's enumeration types.
 Especially with `Option`, which completely removes
 the [null](https://www.infoq.com/presentations/Null-References-The-Billion-Dollar-Mistake-Tony-Hoare/) problem.
 With `Option`, you aren't left wondering whether you should bother adding a null (or nil in Go's case) check as a
-preamble to a function's body whenever you accept references as function arguments, simply because _this is not possible
-in Rust!_ (You can do this in unsafe Rust, but unsafe Rust code is pretty rare).
+preamble to a function's body whenever you accept references as function arguments, simply because _**this is not possible
+in Rust!**_
 
 ## Packages
 
@@ -149,15 +152,15 @@ The path github.com/pkg/errors is pretty easy to remember, but you can imagine t
 a less memorable name, you would be forced to go to Github or pkg.go.dev, search up the full path of the library, _then_
 add it to your project. In contrast to Rust, you would just type the name of the library and the version, like
 this `serde = 1.0`. This is made easier with cargo's extensibility using plugins. You can install the `cargo-add`
-plugin, then all you have to do __is run `cargo add serde`__. This may seem like a small improvement, but when working on
-a non-trivial project, you often have multiple dependencies, and constantly looking up the path can get annoying real
+plugin, then all you have to do __is run `cargo add serde`__. This may seem like a small improvement, but when working
+on a non-trivial project, you often have multiple dependencies, and constantly looking up the path can get annoying real
 fast.
 
 I also like that there is an opinionated way to structure projects. You just run `cargo new` and it creates a new binary
 or library project, complete with the `src` folder. No need to think about whether you need a `pkg` folder or not.
 
 I simply cannot state how absolutely amazing the cargo tool is. It's the small things that make the developer experience
-great. Kudos to the Rust community for creating is an amazing tool!
+great. Kudos to the Rust community for creating this amazing tool!
 
 # Conclusion
 
@@ -165,20 +168,24 @@ My first non-trivial project with Rust was a mixed bag. On one hand, I really li
 well as cargo. This experience only made me want to delve deeper into Rust and made me excited to see what is possible
 with an advanced type system. However, this experience did make me realize a few things.
 
-1. Go is pretty fast, and is good enough for most scenarios
+> Go is pretty fast, and is good enough for most scenarios
 
 Although I was able to beat the Go port eventually, I realized that unless you want total control of how your program
 runs, and you need to squeeze out every bit of performance you get, writing an application in Go will get you pretty
 far. Go tries to mitigate the null (nil) issue with zero values, and offers a simplistic syntax such that anyone with
 decent experience can read code and understand what the code is doing. Combine that with a fairly mature ecosystem of
 libraries that's stabilized after the migration to modules, and Go will be the de facto choice for business applications
-that don't have complex logic or rules and mostly just deal with data fetching and mangling. I would choose Rust for business applications that require absolute safety, performance, [communication with C ABI](https://dave.cheney.net/2016/01/18/cgo-is-not-go) (Go is not great for this), or where I would be forced to originally write C/C++. (This, of course, won't stop me from trying to use Rust wherever I want for hobby projects 😀)
+that don't have complex logic or rules and mostly just deal with data fetching and mangling. I would choose Rust for
+business applications that require absolute safety,
+performance, [communication with C ABI](https://dave.cheney.net/2016/01/18/cgo-is-not-go) (Go is not great for this), or
+where I would be forced to originally write C/C++. (This, of course, won't stop me from trying to use Rust wherever I
+want for hobby projects 😀)
 
-2. Rust's type system is pretty darn great.
+> Rust's type system is pretty darn great.
 
 After experiencing Rust's type system, it completely opened my eyes to what was possible. Enumerations made representing
 invariants infinitely easier than using constants, especially with Rust compiler forcing programmers to deal with _all_
 possible invariants. I actually prefer Rust's explicit polymorphism with traits rather than implicit interface like in
-Go. It makes it easier to trace the code, even it does cause extra code bloat.
+Go. As I write more Rust, I'm looking forward to using generics as well. 
 
-I'm looking forward to writing more Rust!
+I look forward to writing more Rust!
