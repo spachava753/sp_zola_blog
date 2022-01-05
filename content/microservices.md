@@ -35,11 +35,11 @@ We're still missing something...oh yeah! Scalability! One of the most important 
 
 Hm 🤔🤔, what if...nah...maybe...hear me out. Lets run... multiple instances of microservices. I know, I know, it sounds insane, but stay with me. If we were able to run multiple instances, or copies of a single microservice, this would allow to simple acquire more servers instead of dishing out cash for high-spec hardware. As Google calls it, we could run on commodity hardware, that is, buy a couple of used desktops off Ebay, connect them together, and run our microservices on them. Wonderful 🤗! But wait, theres more! How do the other services know where to find our running services? After all, there are multiple copies running at different locations. This is a well known problem called service discovery. But how do we solve this problem?
 
-Besides these concerns, we also have others like encrypting connections between microservices for security, figuring out how to deploy our microservices after we create a new version, setting up a central location for all of our microservices configuration, load-balancing and much more. This whole microservices thing is really starting to daunting...
+Besides these concerns, we also have others like encrypting connections between microservices for security, figuring out how to deploy our microservices after we create a new version, setting up a central location for all of our microservices configuration, load-balancing and much more. This whole microservices thing is really starting to look daunting...
 
 As it turns out, people realized that this whole microservices thing can only work if all of these concerns were addressed. One solution to this problem is Netflix's OSS stack. It is Java-based, and solves the problems mentioned above, like service discovery, central configuration, monitoring, etc. It's most often used with Spring Cloud, which is a set of libraries built to work with the (in?)famous Spring framework. We still haven't addressed one issue: deployment! How are ever supposed to actually deploy our microservices to our Ebay servers?! I guess we can use ssh or ansible or something 😦.
 
-We haven't even got to the part about increasing and decreasing instance of microservice based on demand...😱
+We haven't even got to the part about increasing and decreasing the number of instances of microservices based on demand...😱
 
 # Fast forward to 2020 ⏩
 
