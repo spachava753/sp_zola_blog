@@ -1,6 +1,6 @@
 +++
 title =  "A Gopher's foray into Rust"
-date = 2021-31-29
+date = 2021-06-29
 [taxonomies]
 tags = ["Rust", "Go"]
 +++
